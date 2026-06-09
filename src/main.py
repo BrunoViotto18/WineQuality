@@ -19,8 +19,8 @@ RANDOM_STATE = 42
 
 MODEL_PATH = os.path.join(os.curdir, "models")
 FOREST_MODEL_PATH = os.path.join(MODEL_PATH, "forest.pkl")
-BAGGING_MODEL_PATH = os.path.join(MODEL_PATH, "model2.pkl")
-ADABOOST_MODEL_PATH = os.path.join(MODEL_PATH, "model3.pkl")
+BAGGING_MODEL_PATH = os.path.join(MODEL_PATH, "bagging.pkl")
+ONEVSREST_MODEL_PATH = os.path.join(MODEL_PATH, "onevsrest.pkl")
 
 TEST_SIZE = 0.3
 
@@ -79,30 +79,30 @@ def main() -> None:
     }
 
     models = [
-    (
-        "Random Forest",
-        RandomForestClassifier(random_state=RANDOM_STATE),
-        forest_parameter_map,
-        FOREST_MODEL_PATH,
-    ),
-    (
-        "Bagging KNN Classifier",
-        BaggingClassifier(
-            estimator=KNeighborsClassifier(),
-            random_state=RANDOM_STATE,
+        (
+            "Random Forest",
+            RandomForestClassifier(random_state=RANDOM_STATE),
+            forest_parameter_map,
+            FOREST_MODEL_PATH,
         ),
-        bagging_knn_parameter_map,
-        BAGGING_MODEL_PATH,
-    ),
-    (
-        "One-vs-Rest Logistic Regression",
-        OneVsRestClassifier(
-            LogisticRegression(random_state=RANDOM_STATE)
+        (
+            "Bagging KNN Classifier",
+            BaggingClassifier(
+                estimator=KNeighborsClassifier(),
+                random_state=RANDOM_STATE,
+            ),
+            bagging_knn_parameter_map,
+            BAGGING_MODEL_PATH,
         ),
-        one_vs_rest_parameter_map,
-        ADABOOST_MODEL_PATH,
-    ),
-]
+        (
+            "One-vs-Rest Logistic Regression",
+            OneVsRestClassifier(
+                LogisticRegression(random_state=RANDOM_STATE)
+            ),
+            one_vs_rest_parameter_map,
+            ONEVSREST_MODEL_PATH,
+        ),
+    ]
 
     from pprint import pprint
 
