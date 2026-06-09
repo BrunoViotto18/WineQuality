@@ -1,0 +1,9 @@
+ucimlrepo
+imblearn
+matplotlib
+numpy
+pandas
+scikit-learn
+
+# Matplotlib visualization on Linux
+PyQt6
