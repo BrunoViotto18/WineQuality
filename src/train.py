@@ -6,18 +6,18 @@ import pickle
 
 from imblearn.over_sampling import SMOTE
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay, f1_score
+from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, confusion_matrix, f1_score
 from sklearn.model_selection import RandomizedSearchCV, cross_validate, train_test_split
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.ensemble import RandomForestClassifier, BaggingClassifier, AdaBoostClassifier
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from ucimlrepo import fetch_ucirepo
 
 RANDOM_STATE = 42
 
 MODEL_PATH = os.path.join(os.curdir, "models")
+MINMAX_MODEL_PATH = os.path.join(MODEL_PATH, "minmax.pkl")
 FOREST_MODEL_PATH = os.path.join(MODEL_PATH, "forest.pkl")
 BAGGING_MODEL_PATH = os.path.join(MODEL_PATH, "bagging.pkl")
 ONEVSREST_MODEL_PATH = os.path.join(MODEL_PATH, "onevsrest.pkl")
@@ -30,7 +30,7 @@ def main() -> None:
     # fetch dataset
     wine_quality = fetch_ucirepo(id=186)
 
-    # data (as pandas dataframes)
+    # data (as pandas dataframes)35
     data = pd.DataFrame(wine_quality.data.features)
     classes = wine_quality.data.targets.squeeze()
 
@@ -38,6 +38,9 @@ def main() -> None:
 
     scaled_data = scaler.fit_transform(data)
     data = pd.DataFrame(scaled_data, columns=data.columns)
+
+    with open(MINMAX_MODEL_PATH, 'wb') as f:
+        pickle.dump(scaler, f)
 
     balancer = SMOTE(k_neighbors=4, random_state=RANDOM_STATE)
     balanced_data, balanced_classes = balancer.fit_resample(data, classes)
@@ -125,22 +128,6 @@ def main() -> None:
         pprint(hyper_parameters.best_params_)
 
         model = hyper_parameters.best_estimator_
-
-        scoring = ["accuracy", "f1_macro"]
-        scores_cross = cross_validate(
-            model,
-            balanced_data,
-            balanced_classes,
-            scoring=scoring,
-            n_jobs=1,
-            cv=10,
-            verbose=1,
-        )
-
-        print("Resultado do cross vall:", scores_cross)
-        print("Acurácia:", scores_cross["test_accuracy"].mean())
-        print("F1 Score:", scores_cross["test_f1_macro"].mean())
-        print()
 
         model = model.fit(data_train, class_train)
 
